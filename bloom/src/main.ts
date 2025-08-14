@@ -18,8 +18,7 @@ k.loadSprite("flower", "sprites/flower.png", {
 });
 
 const flower = k.add([
-  k.sprite("flower", {
-    frame: 0,
-  }),
+  k.sprite("flower", { frame: 0 }),
   k.pos(144, 104),
+  k.health(100, 100),
 ]);
