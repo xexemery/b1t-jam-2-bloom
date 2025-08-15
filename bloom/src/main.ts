@@ -17,8 +17,18 @@ k.loadSprite("flower", "sprites/flower.png", {
   sliceY: 1,
 });
 
+k.loadSprite("bloom", "sprites/bloom.png", {
+  sliceX: 7,
+  sliceY: 1,
+});
+
 const flower = k.add([
   k.sprite("flower", { frame: 0 }),
   k.pos(144, 104),
   k.health(100, 100),
+]);
+
+const bloom = k.add([
+  k.sprite("bloom", { frame: 0 }),
+  k.pos(50, 50)
 ]);
