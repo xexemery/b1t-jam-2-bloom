@@ -1,5 +1,12 @@
 import kaplay from "kaplay";
-import type { GameObj, AreaComp, Vec2 } from "kaplay";
+import type {
+  Vec2,
+  GameObj,
+  SpriteComp,
+  PosComp,
+  AreaComp,
+  HealthComp,
+} from "kaplay";
 
 const SCREEN_WIDTH: number = 320;
 const SCREEN_HEIGHT: number = 240;
@@ -46,7 +53,7 @@ k.loadSprite("bloom", "sprites/bloom.png", {
 
 k.scene("game", () => {
   // add main flower
-  const flower: GameObj = k.add([
+  const flower: GameObj<SpriteComp | PosComp | AreaComp | HealthComp> = k.add([
     k.sprite("flower", { frame: 0 }),
     k.pos((SCREEN_WIDTH - FLOWER_SIZE) / 2, (SCREEN_HEIGHT - FLOWER_SIZE) / 2),
     k.area(),
@@ -56,7 +63,7 @@ k.scene("game", () => {
   // spawn bloom object
   function spawnBloom(): void {
     // add bloom
-    const bloom: GameObj<AreaComp> = k.add([
+    const bloom: GameObj<SpriteComp | PosComp | AreaComp> = k.add([
       k.sprite("bloom", { frame: 0, anim: "grow" }),
       k.pos(generateCoords()),
       k.area(),
@@ -89,8 +96,9 @@ k.scene("game", () => {
   // cut off head of bloom
   function cutBloom(bloom: GameObj): void {
     if (bloom.frame > 2) {
+      updateScore(bloom.frame - 2);
       bloom.play("cut");
-      k.wait(k.rand(2, 5), () => bloom.play("bloom"));
+      k.wait(k.rand(5, 8), () => bloom.play("bloom"));
     }
   }
 
@@ -114,10 +122,7 @@ k.scene("game", () => {
   ]);
 
   // update and display score
-  function updateScore(blooms: GameObj[]): void {
-    const scoreToAdd: number = blooms
-      .filter((bloom: GameObj) => bloom.frame > 2)
-      .reduce((total: number, bloom: GameObj) => total + bloom.frame - 2, 0);
+  function updateScore(scoreToAdd: number): void {
     score += scoreToAdd;
     scoreLabel.text = score.toString();
   }
@@ -130,14 +135,17 @@ k.scene("game", () => {
     healthLabel.text = flower.hp().toString();
   }
 
-  // update score and health every second
+  // update health every second
   k.loop(1, () => {
     const blooms = k.get("bloom");
     const fullBlooms = blooms.filter((bloom: GameObj) => bloom.frame === 6);
 
-    updateScore(blooms);
     updateHealth(blooms.length, fullBlooms.length);
   });
+
+  flower.onDeath(() => k.go("lose", score));
 });
+
+k.scene("lose", (score) => {});
 
 k.go("game");
