@@ -30,8 +30,9 @@ k.loadSprite("bloom", "sprites/bloom.png", {
   sliceX: 7,
   sliceY: 1,
   anims: {
-    bloom: { from: 0, to: 6, loop: false },
-    cut: { from: 2, to: 6, loop: false },
+    grow: { from: 0, to: 6, loop: false, speed: 1 },
+    bloom: { from: 3, to: 6, loop: false, speed: 1 },
+    cut: { from: 2, to: 2 },
   },
 });
 
@@ -57,7 +58,7 @@ k.scene("game", () => {
   function spawnBloom(): void {
     // add bloom
     k.add([
-      k.sprite("bloom", { frame: 0, anim: "bloom", animSpeed: 0.1 }),
+      k.sprite("bloom", { frame: 0, anim: "grow" }),
       k.pos(generateCoords()),
       k.area(),
       "bloom",
@@ -83,7 +84,10 @@ k.scene("game", () => {
 
   // cut off head of bloom if clicked
   k.onClick("bloom", (bloom) => {
-    if (bloom.frame > 2) bloom.play("cut");
+    if (bloom.frame > 2) {
+      bloom.play("cut");
+      k.wait(k.rand(2, 5), () => bloom.play("bloom"));
+    }
   });
 
   // spawn bloom every 5 seconds
