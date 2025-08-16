@@ -1,9 +1,16 @@
 import kaplay from "kaplay";
+import type { Vec2 } from "kaplay";
+
+const SCREEN_WIDTH: number = 320;
+const SCREEN_HEIGHT: number = 240;
+const FLOWER_SIZE: number = 32;
+const BLOOM_WIDTH: number = 32;
+const BLOOM_HEIGHT: number = 64;
 
 // initialise context
 const k = kaplay({
-  width: 320,
-  height: 240,
+  width: SCREEN_WIDTH,
+  height: SCREEN_HEIGHT,
   stretch: true,
   letterbox: true,
   crisp: true,
@@ -32,22 +39,39 @@ k.scene("game", () => {
   // add main flower
   const flower = k.add([
     k.sprite("flower", { frame: 0 }),
-    k.pos(144, 104),
+    k.pos((SCREEN_WIDTH - FLOWER_SIZE) / 2, (SCREEN_HEIGHT - FLOWER_SIZE) / 2),
     k.area(),
     k.health(100, 100),
   ]);
 
-  function spawnBloom() {
+  function spawnBloom(): void {
     // add bloom
     k.add([
       k.sprite("bloom", { frame: 0, anim: "bloom", animSpeed: 0.1 }),
-      k.pos(k.rand(k.vec2(288, 176))),
+      k.pos(generateCoords()),
       k.area(),
       "bloom",
     ]);
 
     // wait 5 seconds to spawn next bloom
     k.wait(5, spawnBloom);
+  }
+
+  function generateCoords(): Vec2 {
+    let coords: Vec2 = k.rand(
+      k.vec2(SCREEN_WIDTH - BLOOM_WIDTH, SCREEN_HEIGHT - BLOOM_HEIGHT)
+    );
+
+    if (
+      coords.x > flower.pos.x - BLOOM_WIDTH &&
+      coords.x < flower.pos.x + FLOWER_SIZE &&
+      coords.y > flower.pos.y - BLOOM_HEIGHT &&
+      coords.y < flower.pos.y + FLOWER_SIZE
+    ) {
+      return generateCoords();
+    }
+
+    return coords;
   }
 
   // cut off head of bloom if clicked
