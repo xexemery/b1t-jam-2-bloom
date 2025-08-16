@@ -102,8 +102,8 @@ k.scene("game", () => {
     }
   }
 
-  // spawn bloom every 5 seconds
-  k.loop(5, spawnBloom);
+  // spawn bloom every 2 seconds
+  k.loop(2, spawnBloom);
 
   // keep track of score
   let score: number = 0;
@@ -133,6 +133,18 @@ k.scene("game", () => {
     else if (numBlooms > 10) flower.hurt(numFullBlooms);
 
     healthLabel.text = flower.hp().toString();
+    updateSprite(flower.hp());
+  }
+
+  // update flower sprite based on health
+  function updateSprite(health: number): void {
+    if (health > 50 && flower.frame !== 0) {
+      flower.frame = 0;
+    } else if (health > 20 && health <= 50 && flower.frame !== 1) {
+      flower.frame = 1;
+    } else if (health <= 20 && flower.frame !== 2) {
+      flower.frame = 2;
+    }
   }
 
   // update health every second
@@ -140,6 +152,7 @@ k.scene("game", () => {
     const blooms = k.get("bloom");
     const fullBlooms = blooms.filter((bloom: GameObj) => bloom.frame === 6);
 
+    updateScore(fullBlooms.length);
     updateHealth(blooms.length, fullBlooms.length);
   });
 
