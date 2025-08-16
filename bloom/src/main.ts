@@ -53,17 +53,6 @@ k.scene("game", () => {
     k.health(100, 100),
   ]);
 
-  function reduceHealth(): void {
-    const amountToReduce: number = k
-      .get("bloom")
-      .reduce((total: number, bloom: GameObj) => {
-        if (bloom.frame > 2) total += bloom.frame - 2;
-        return total;
-      }, 0);
-
-    flower.hurt(amountToReduce);
-  }
-
   // spawn bloom object
   function spawnBloom(): void {
     // add bloom
@@ -117,21 +106,39 @@ k.scene("game", () => {
     k.pos(8, 0),
   ]);
 
-  // add 1 point for every full bloom
-  function updateScore(): void {
-    const scoreToAdd: number = k
-      .get("bloom")
-      .reduce((total: number, bloom: GameObj) => {
-        if (bloom.frame === 6) total++;
-        return total;
-      }, 0);
+  // keep track of health
+  const healthLabel: GameObj = k.add([
+    k.text(flower.hp().toString(), { size: 16 }),
+    k.color("#ea6262"),
+    k.pos(8, 16),
+  ]);
 
+  // update and display score
+  function updateScore(scoreToAdd: number): void {
     score += scoreToAdd;
     scoreLabel.text = score.toString();
   }
 
-  // update score every 0.5 seconds
-  k.loop(0.5, updateScore);
+  // update and display health
+  function updateHealth(blooms: GameObj[]): void {
+    const amountToReduce: number = blooms
+      .filter((bloom: GameObj) => bloom.frame > 2)
+      .reduce((total: number, bloom: GameObj) => total + bloom.frame - 2, 0);
+
+    flower.hurt(amountToReduce);
+    if (blooms.length < 5) flower.heal(10);
+
+    healthLabel.text = flower.hp().toString();
+  }
+
+  // update score and health every second
+  k.loop(1, () => {
+    const blooms = k.get("bloom");
+    const fullBlooms = blooms.filter((bloom: GameObj) => bloom.frame === 6);
+
+    updateScore(fullBlooms.length);
+    updateHealth(blooms);
+  });
 });
 
 k.go("game");
