@@ -24,6 +24,7 @@ k.loadSprite("bloom", "sprites/bloom.png", {
   sliceY: 1,
   anims: {
     bloom: { from: 0, to: 6, loop: false },
+    cut: { from: 2, to: 6, loop: false },
   },
 });
 
@@ -31,8 +32,8 @@ k.scene("game", () => {
   // add main flower
   const flower = k.add([
     k.sprite("flower", { frame: 0 }),
-    k.area(),
     k.pos(144, 104),
+    k.area(),
     k.health(100, 100),
   ]);
 
@@ -40,14 +41,19 @@ k.scene("game", () => {
     // add bloom
     k.add([
       k.sprite("bloom", { frame: 0, anim: "bloom", animSpeed: 0.1 }),
-      k.area(),
       k.pos(k.rand(k.vec2(288, 176))),
+      k.area(),
       "bloom",
     ]);
 
     // wait 5 seconds to spawn next bloom
     k.wait(5, spawnBloom);
   }
+
+  // cut off head of bloom if clicked
+  k.onClick("bloom", (bloom) => {
+    if (bloom.frame > 2) bloom.play("cut");
+  });
 
   // start spawning blooms
   spawnBloom();
