@@ -44,6 +44,16 @@ k.scene("game", () => {
     k.health(100, 100),
   ]);
 
+  function reduceHealth(): void {
+    const amountToReduce = k.get("bloom").reduce((total, bloom) => {
+      if (bloom.frame > 2) {
+        return (total += bloom.frame - 2);
+      }
+    }, 0);
+
+    flower.hurt(amountToReduce);
+  }
+
   function spawnBloom(): void {
     // add bloom
     k.add([
