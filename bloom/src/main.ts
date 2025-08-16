@@ -52,9 +52,6 @@ k.scene("game", () => {
       k.area(),
       "bloom",
     ]);
-
-    // wait 5 seconds to spawn next bloom
-    k.wait(5, spawnBloom);
   }
 
   function generateCoords(): Vec2 {
@@ -79,8 +76,8 @@ k.scene("game", () => {
     if (bloom.frame > 2) bloom.play("cut");
   });
 
-  // start spawning blooms
-  spawnBloom();
+  // spawn bloom every 5 seconds
+  k.loop(5, spawnBloom);
 });
 
 k.go("game");
