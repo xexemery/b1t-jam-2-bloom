@@ -11,16 +11,24 @@ const BLOOM_HEIGHT: number = 64;
 const k = kaplay({
   width: SCREEN_WIDTH,
   height: SCREEN_HEIGHT,
+  scale: 3,
   stretch: true,
   letterbox: true,
   crisp: true,
+  font: "pixel",
   background: "#4a3052",
+  texFilter: "nearest",
   global: false,
 });
 
 k.loadRoot("./"); // for itch.io publishing purposes
 
 // load assets
+k.loadFont("pixel", "fonts/kenney-pixel.ttf", {
+  filter: "nearest",
+  size: 16,
+});
+
 k.loadSprite("flower", "sprites/flower.png", {
   sliceX: 3,
   sliceY: 1,
@@ -57,6 +65,7 @@ k.scene("game", () => {
     flower.hurt(amountToReduce);
   }
 
+  // spawn bloom object
   function spawnBloom(): void {
     // add bloom
     const bloom: GameObj<AreaComp> = k.add([
@@ -71,7 +80,7 @@ k.scene("game", () => {
     bloom.onClick(() => k.destroy(bloom), "right");
   }
 
-  // generate coords for bloom so they don't overlap flower
+  // generate coords so they don't overlap flower
   function generateCoords(): Vec2 {
     let coords: Vec2 = k.rand(
       k.vec2(SCREEN_WIDTH - BLOOM_WIDTH, SCREEN_HEIGHT - BLOOM_HEIGHT)
@@ -99,6 +108,21 @@ k.scene("game", () => {
 
   // spawn bloom every 5 seconds
   k.loop(5, spawnBloom);
+
+  // keep track of score
+  let score: number = 0;
+
+  const scoreLabel: GameObj = k.add([
+    k.text(score.toString(), { size: 16 }),
+    k.color("#ea6262"),
+    k.pos(8, 0),
+  ]);
+
+  // increment score every frame
+  k.onUpdate(() => {
+    score++;
+    scoreLabel.text = score.toString();
+  });
 });
 
 k.go("game");
