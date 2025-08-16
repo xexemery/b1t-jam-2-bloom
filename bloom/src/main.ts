@@ -14,8 +14,8 @@ const k = kaplay({
   scale: 3,
   stretch: true,
   letterbox: true,
-  crisp: true,
   font: "pixel",
+  crisp: true,
   background: "#4a3052",
   texFilter: "nearest",
   global: false,
@@ -57,9 +57,8 @@ k.scene("game", () => {
     const amountToReduce: number = k
       .get("bloom")
       .reduce((total: number, bloom: GameObj) => {
-        if (bloom.frame > 2) {
-          return (total += bloom.frame - 2);
-        }
+        if (bloom.frame > 2) total += bloom.frame - 2;
+        return total;
       }, 0);
 
     flower.hurt(amountToReduce);
@@ -118,11 +117,21 @@ k.scene("game", () => {
     k.pos(8, 0),
   ]);
 
-  // increment score every frame
-  k.onUpdate(() => {
-    score++;
+  // add 1 point for every full bloom
+  function updateScore(): void {
+    const scoreToAdd: number = k
+      .get("bloom")
+      .reduce((total: number, bloom: GameObj) => {
+        if (bloom.frame === 6) total++;
+        return total;
+      }, 0);
+
+    score += scoreToAdd;
     scoreLabel.text = score.toString();
-  });
+  }
+
+  // update score every 0.5 seconds
+  k.loop(0.5, updateScore);
 });
 
 k.go("game");
