@@ -1,5 +1,5 @@
 import kaplay from "kaplay";
-import type { Vec2 } from "kaplay";
+import type { GameObj, AreaComp, Vec2 } from "kaplay";
 
 const SCREEN_WIDTH: number = 320;
 const SCREEN_HEIGHT: number = 240;
@@ -38,7 +38,7 @@ k.loadSprite("bloom", "sprites/bloom.png", {
 
 k.scene("game", () => {
   // add main flower
-  const flower = k.add([
+  const flower: GameObj = k.add([
     k.sprite("flower", { frame: 0 }),
     k.pos((SCREEN_WIDTH - FLOWER_SIZE) / 2, (SCREEN_HEIGHT - FLOWER_SIZE) / 2),
     k.area(),
@@ -46,25 +46,32 @@ k.scene("game", () => {
   ]);
 
   function reduceHealth(): void {
-    const amountToReduce = k.get("bloom").reduce((total, bloom) => {
-      if (bloom.frame > 2) {
-        return (total += bloom.frame - 2);
-      }
-    }, 0);
+    const amountToReduce: number = k
+      .get("bloom")
+      .reduce((total: number, bloom: GameObj) => {
+        if (bloom.frame > 2) {
+          return (total += bloom.frame - 2);
+        }
+      }, 0);
 
     flower.hurt(amountToReduce);
   }
 
   function spawnBloom(): void {
     // add bloom
-    k.add([
+    const bloom: GameObj<AreaComp> = k.add([
       k.sprite("bloom", { frame: 0, anim: "grow" }),
       k.pos(generateCoords()),
       k.area(),
       "bloom",
     ]);
+
+    // add click event handlers
+    bloom.onClick(() => cutBloom(bloom), "left");
+    bloom.onClick(() => k.destroy(bloom), "right");
   }
 
+  // generate coords for bloom so they don't overlap flower
   function generateCoords(): Vec2 {
     let coords: Vec2 = k.rand(
       k.vec2(SCREEN_WIDTH - BLOOM_WIDTH, SCREEN_HEIGHT - BLOOM_HEIGHT)
@@ -82,13 +89,13 @@ k.scene("game", () => {
     return coords;
   }
 
-  // cut off head of bloom if clicked
-  k.onClick("bloom", (bloom) => {
+  // cut off head of bloom
+  function cutBloom(bloom: GameObj): void {
     if (bloom.frame > 2) {
       bloom.play("cut");
       k.wait(k.rand(2, 5), () => bloom.play("bloom"));
     }
-  });
+  }
 
   // spawn bloom every 5 seconds
   k.loop(5, spawnBloom);
