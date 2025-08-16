@@ -114,19 +114,18 @@ k.scene("game", () => {
   ]);
 
   // update and display score
-  function updateScore(scoreToAdd: number): void {
+  function updateScore(blooms: GameObj[]): void {
+    const scoreToAdd: number = blooms
+      .filter((bloom: GameObj) => bloom.frame > 2)
+      .reduce((total: number, bloom: GameObj) => total + bloom.frame - 2, 0);
     score += scoreToAdd;
     scoreLabel.text = score.toString();
   }
 
   // update and display health
-  function updateHealth(blooms: GameObj[]): void {
-    const amountToReduce: number = blooms
-      .filter((bloom: GameObj) => bloom.frame > 2)
-      .reduce((total: number, bloom: GameObj) => total + bloom.frame - 2, 0);
-
-    flower.hurt(amountToReduce);
-    if (blooms.length < 5) flower.heal(10);
+  function updateHealth(numBlooms: number, numFullBlooms: number): void {
+    if (numBlooms <= 5) flower.heal(10);
+    else if (numBlooms > 10) flower.hurt(numFullBlooms);
 
     healthLabel.text = flower.hp().toString();
   }
@@ -136,8 +135,8 @@ k.scene("game", () => {
     const blooms = k.get("bloom");
     const fullBlooms = blooms.filter((bloom: GameObj) => bloom.frame === 6);
 
-    updateScore(fullBlooms.length);
-    updateHealth(blooms);
+    updateScore(blooms);
+    updateHealth(blooms.length, fullBlooms.length);
   });
 });
 
