@@ -13,7 +13,7 @@ const SCREEN_HEIGHT: number = 240;
 const FLOWER_SIZE: number = 32;
 const BLOOM_WIDTH: number = 32;
 const BLOOM_HEIGHT: number = 64;
-const MAX_BLOOMS: number = 50;
+const MAX_BLOOMS: number = 60;
 
 // initialise context
 const k = kaplay({
@@ -22,6 +22,7 @@ const k = kaplay({
   scale: 3,
   stretch: false,
   letterbox: false,
+  debug: false,
   font: "pixel",
   crisp: false,
   background: "#4a3052",
@@ -96,7 +97,7 @@ k.scene("game", () => {
   // spawn bloom object
   function spawnBloom(): void {
     // don't add more blooms beyond maximum
-    if (numBlooms > MAX_BLOOMS) {
+    if (numBlooms >= MAX_BLOOMS) {
       return;
     }
 
@@ -111,8 +112,7 @@ k.scene("game", () => {
     numBlooms++;
 
     // add click event handlers
-    bloom.onClick(() => cutBloom(bloom), "left");
-    bloom.onClick(() => removeBloom(bloom), "right");
+    bloom.onClick(() => cutBloom(bloom));
   }
 
   // generate coords so they don't overlap flower
@@ -145,14 +145,6 @@ k.scene("game", () => {
     }
   }
 
-  // remove bloom
-  function removeBloom(bloom: GameObj) {
-    if (bloom.frame <= 2) {
-      k.destroy(bloom);
-      numBlooms--;
-    }
-  }
-
   // spawn bloom every 2 seconds
   k.loop(2, spawnBloom);
 
@@ -161,7 +153,7 @@ k.scene("game", () => {
 
   const scoreLabel: GameObj = k.add([
     k.text(score.toString(), { size: 16 }),
-    k.color("#ea6262"),
+    k.color("#fc5a64"),
     k.pos(8, 0),
   ]);
 
@@ -170,8 +162,9 @@ k.scene("game", () => {
     k.text(`${flower.hp()}/${flower.maxHP()}`, {
       size: 16,
     }),
-    k.color("#ea6262"),
-    k.pos(8, 16),
+    k.color("#fc5a64"),
+    k.pos(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 20),
+    k.anchor("center"),
   ]);
 
   // update and display score
@@ -203,7 +196,7 @@ k.scene("game", () => {
 
   // hurt flower based on number of blooms
   function hurtFlower(): void {
-    if (numBlooms === 50) flower.hurt(5);
+    if (numBlooms >= 50) flower.hurt(5);
     else if (numBlooms >= 40) flower.hurt(3);
     else if (numBlooms >= 30) flower.hurt(1);
 
@@ -226,7 +219,7 @@ k.scene("lose", (score) => {
   // add score
   k.add([
     k.text(score.toString(), { size: 32 }),
-    k.color("#ea6262"),
+    k.color("#fc5a64"),
     k.pos(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + FLOWER_SIZE),
     k.anchor("center"),
   ]);
