@@ -33,6 +33,8 @@ const k = kaplay({
 k.loadRoot("./"); // for itch.io publishing purposes
 
 // load assets
+k.loadMusic("song", "music/funny-bit.mp3");
+
 k.loadFont("pixel", "fonts/kenney-pixel.ttf", {
   filter: "nearest",
   size: 16,
@@ -85,6 +87,12 @@ k.loadSprite("gameover", "sprites/gameover.png", {
 k.scene("title", () => {
   // add title screen
   k.add([k.sprite("title", { frame: 0, anim: "main" }), k.pos()]);
+
+  // set volume
+  k.setVolume(0.2);
+
+  // play music
+  k.play("song", { loop: true });
 
   // go to rules on click
   k.onClick(() => k.go("rules"));
