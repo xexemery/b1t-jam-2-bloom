@@ -37,6 +37,14 @@ k.loadFont("pixel", "fonts/kenney-pixel.ttf", {
   size: 16,
 });
 
+k.loadSprite("title", "sprites/title.png", {
+  sliceX: 2,
+  sliceY: 1,
+  anims: {
+    main: { from: 0, to: 1, loop: true, speed: 4 },
+  },
+});
+
 k.loadSprite("flower", "sprites/flower.png", {
   sliceX: 6,
   sliceY: 1,
@@ -71,6 +79,14 @@ k.loadSprite("friend2", "sprites/friend2.png", {
   anims: {
     idle: { from: 0, to: 1, loop: true, speed: 3 },
   },
+});
+
+k.scene("title", () => {
+  // add title screen
+  k.add([k.sprite("title", { frame: 0, anim: "main" }), k.pos()]);
+
+  // start game on click
+  k.onClick(() => k.go("game"));
 });
 
 k.scene("game", () => {
@@ -203,4 +219,4 @@ k.scene("game", () => {
 
 k.scene("lose", (score) => {});
 
-k.go("game");
+k.go("title");
