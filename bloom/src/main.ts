@@ -87,7 +87,7 @@ k.scene("game", () => {
     k.sprite("flower", { frame: 0, anim: "idle" }),
     k.pos((SCREEN_WIDTH - FLOWER_SIZE) / 2, (SCREEN_HEIGHT - FLOWER_SIZE) / 2),
     k.area(),
-    k.health(100, 100),
+    k.health(10, 100),
   ]);
 
   // keep track of bloom number
@@ -136,6 +136,10 @@ k.scene("game", () => {
   // cut off head of bloom
   function cutBloom(bloom: GameObj): void {
     if (bloom.frame > 2) {
+      if (bloom.frame === 5) flower.heal(1);
+      else if (bloom.frame === 6) flower.heal(2);
+      updateHealth();
+
       bloom.play("cut");
       k.wait(k.rand(5, 8), () => bloom.play("bloom"));
     }
@@ -163,7 +167,9 @@ k.scene("game", () => {
 
   // keep track of health
   const healthLabel: GameObj = k.add([
-    k.text(flower.hp().toString(), { size: 16 }),
+    k.text(`${flower.hp()}/${flower.maxHP()}`, {
+      size: 16,
+    }),
     k.color("#ea6262"),
     k.pos(8, 16),
   ]);
@@ -175,10 +181,8 @@ k.scene("game", () => {
   }
 
   // update and display health
-  function updateHealth(numBlooms: number, numFullBlooms: number): void {
-    if (numBlooms <= 5) flower.heal(10);
-
-    healthLabel.text = flower.hp().toString();
+  function updateHealth(): void {
+    healthLabel.text = `${flower.hp()}/${flower.maxHP()}`;
     updateSprite(flower.hp());
   }
 
@@ -197,13 +201,19 @@ k.scene("game", () => {
     }
   }
 
-  // update score and health every second
-  k.loop(1, () => {
-    const blooms = k.get("bloom");
-    const fullBlooms = blooms.filter((bloom: GameObj) => bloom.frame === 6);
+  // hurt flower based on number of blooms
+  function hurtFlower(): void {
+    if (numBlooms === 50) flower.hurt(5);
+    else if (numBlooms >= 40) flower.hurt(3);
+    else if (numBlooms >= 30) flower.hurt(1);
 
+    updateHealth();
+  }
+
+  // update score and hurt flower every second
+  k.loop(1, () => {
     updateScore();
-    updateHealth(blooms.length, fullBlooms.length);
+    hurtFlower();
   });
 
   flower.onDeath(() => k.go("lose", score));
