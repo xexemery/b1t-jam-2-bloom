@@ -19,10 +19,10 @@ const k = kaplay({
   width: SCREEN_WIDTH,
   height: SCREEN_HEIGHT,
   scale: 3,
-  stretch: true,
-  letterbox: true,
+  stretch: false,
+  letterbox: false,
   font: "pixel",
-  crisp: true,
+  crisp: false,
   background: "#4a3052",
   texFilter: "nearest",
   global: false,
@@ -37,8 +37,13 @@ k.loadFont("pixel", "fonts/kenney-pixel.ttf", {
 });
 
 k.loadSprite("flower", "sprites/flower.png", {
-  sliceX: 3,
+  sliceX: 6,
   sliceY: 1,
+  anims: {
+    idle: { from: 0, to: 1, loop: true, speed: 3 },
+    wilt: { from: 2, to: 3, loop: true, speed: 3 },
+    dying: { from: 4, to: 5, loop: true, speed: 3 },
+  },
 });
 
 k.loadSprite("bloom", "sprites/bloom.png", {
@@ -51,10 +56,26 @@ k.loadSprite("bloom", "sprites/bloom.png", {
   },
 });
 
+k.loadSprite("friend1", "sprites/friend1.png", {
+  sliceX: 2,
+  sliceY: 1,
+  anims: {
+    idle: { from: 0, to: 1, loop: true, speed: 3 },
+  },
+});
+
+k.loadSprite("friend2", "sprites/friend2.png", {
+  sliceX: 2,
+  sliceY: 1,
+  anims: {
+    idle: { from: 0, to: 1, loop: true, speed: 3 },
+  },
+});
+
 k.scene("game", () => {
   // add main flower
   const flower: GameObj<SpriteComp | PosComp | AreaComp | HealthComp> = k.add([
-    k.sprite("flower", { frame: 0 }),
+    k.sprite("flower", { frame: 0, anim: "idle" }),
     k.pos((SCREEN_WIDTH - FLOWER_SIZE) / 2, (SCREEN_HEIGHT - FLOWER_SIZE) / 2),
     k.area(),
     k.health(100, 100),
@@ -138,12 +159,16 @@ k.scene("game", () => {
 
   // update flower sprite based on health
   function updateSprite(health: number): void {
-    if (health > 50 && flower.frame !== 0) {
-      flower.frame = 0;
-    } else if (health > 20 && health <= 50 && flower.frame !== 1) {
-      flower.frame = 1;
-    } else if (health <= 20 && flower.frame !== 2) {
-      flower.frame = 2;
+    if (health > 50 && flower.getCurAnim().name !== "idle") {
+      flower.play("idle");
+    } else if (
+      health > 20 &&
+      health <= 50 &&
+      flower.getCurAnim().name !== "wilt"
+    ) {
+      flower.play("wilt");
+    } else if (health <= 20 && flower.getCurAnim().name !== "dying") {
+      flower.play("dying");
     }
   }
 
