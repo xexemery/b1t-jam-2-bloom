@@ -13,6 +13,7 @@ const SCREEN_HEIGHT: number = 240;
 const FLOWER_SIZE: number = 32;
 const BLOOM_WIDTH: number = 32;
 const BLOOM_HEIGHT: number = 64;
+const MAX_BLOOMS: number = 50;
 
 // initialise context
 const k = kaplay({
@@ -81,8 +82,16 @@ k.scene("game", () => {
     k.health(100, 100),
   ]);
 
+  // keep track of bloom number
+  let numBlooms: number = 0;
+
   // spawn bloom object
   function spawnBloom(): void {
+    // don't add more blooms beyond maximum
+    if (numBlooms > MAX_BLOOMS) {
+      return;
+    }
+
     // add bloom
     const bloom: GameObj<SpriteComp | PosComp | AreaComp> = k.add([
       k.sprite("bloom", { frame: 0, anim: "grow" }),
@@ -91,9 +100,11 @@ k.scene("game", () => {
       "bloom",
     ]);
 
+    numBlooms++;
+
     // add click event handlers
     bloom.onClick(() => cutBloom(bloom), "left");
-    bloom.onClick(() => k.destroy(bloom), "right");
+    bloom.onClick(() => removeBloom(bloom), "right");
   }
 
   // generate coords so they don't overlap flower
@@ -117,9 +128,16 @@ k.scene("game", () => {
   // cut off head of bloom
   function cutBloom(bloom: GameObj): void {
     if (bloom.frame > 2) {
-      updateScore(bloom.frame - 2);
       bloom.play("cut");
       k.wait(k.rand(5, 8), () => bloom.play("bloom"));
+    }
+  }
+
+  // remove bloom
+  function removeBloom(bloom: GameObj) {
+    if (bloom.frame <= 2) {
+      k.destroy(bloom);
+      numBlooms--;
     }
   }
 
@@ -143,15 +161,14 @@ k.scene("game", () => {
   ]);
 
   // update and display score
-  function updateScore(scoreToAdd: number): void {
-    score += scoreToAdd;
+  function updateScore(): void {
+    score++;
     scoreLabel.text = score.toString();
   }
 
   // update and display health
   function updateHealth(numBlooms: number, numFullBlooms: number): void {
     if (numBlooms <= 5) flower.heal(10);
-    else if (numBlooms > 10) flower.hurt(numFullBlooms);
 
     healthLabel.text = flower.hp().toString();
     updateSprite(flower.hp());
@@ -172,12 +189,12 @@ k.scene("game", () => {
     }
   }
 
-  // update health every second
+  // update score and health every second
   k.loop(1, () => {
     const blooms = k.get("bloom");
     const fullBlooms = blooms.filter((bloom: GameObj) => bloom.frame === 6);
 
-    updateScore(fullBlooms.length);
+    updateScore();
     updateHealth(blooms.length, fullBlooms.length);
   });
 
