@@ -222,6 +222,17 @@ k.scene("game", () => {
 k.scene("lose", (score) => {
   // add game over screen
   k.add([k.sprite("gameover", { frame: 0, anim: "main" }), k.pos()]);
+
+  // add score
+  k.add([
+    k.text(score.toString(), { size: 32 }),
+    k.color("#ea6262"),
+    k.pos(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + FLOWER_SIZE),
+    k.anchor("center"),
+  ]);
+
+  // restart game on click
+  k.onClick(() => k.go("game"));
 });
 
 k.go("title");
