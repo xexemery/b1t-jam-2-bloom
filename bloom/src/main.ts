@@ -65,19 +65,11 @@ k.loadSprite("bloom", "sprites/bloom.png", {
   },
 });
 
-k.loadSprite("friend1", "sprites/friend1.png", {
+k.loadSprite("gameover", "sprites/gameover.png", {
   sliceX: 2,
   sliceY: 1,
   anims: {
-    idle: { from: 0, to: 1, loop: true, speed: 3 },
-  },
-});
-
-k.loadSprite("friend2", "sprites/friend2.png", {
-  sliceX: 2,
-  sliceY: 1,
-  anims: {
-    idle: { from: 0, to: 1, loop: true, speed: 3 },
+    main: { from: 0, to: 1, loop: true, speed: 4 },
   },
 });
 
@@ -217,6 +209,9 @@ k.scene("game", () => {
   flower.onDeath(() => k.go("lose", score));
 });
 
-k.scene("lose", (score) => {});
+k.scene("lose", (score) => {
+  // add game over screen
+  k.add([k.sprite("gameover", { frame: 0, anim: "main" }), k.pos()]);
+});
 
 k.go("title");
