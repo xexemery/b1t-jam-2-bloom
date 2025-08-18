@@ -177,7 +177,7 @@ k.scene("game", () => {
 
   const scoreLabel: GameObj = k.add([
     k.text(score.toString(), { size: 16 }),
-    k.color("#fc5a64"),
+    k.color("#ea6262"),
     k.pos(8, 0),
   ]);
 
@@ -186,7 +186,7 @@ k.scene("game", () => {
     k.text(`${flower.hp()}/${flower.maxHP()}`, {
       size: 16,
     }),
-    k.color("#fc5a64"),
+    k.color("#ea6262"),
     k.pos(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 20),
     k.anchor("center"),
   ]);
@@ -243,7 +243,7 @@ k.scene("lose", (score) => {
   // add score
   k.add([
     k.text(score.toString(), { size: 32 }),
-    k.color("#fc5a64"),
+    k.color("#ea6262"),
     k.pos(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + FLOWER_SIZE),
     k.anchor("center"),
   ]);
