@@ -84,6 +84,20 @@ k.loadSprite("gameover", "sprites/gameover.png", {
   },
 });
 
+// load shader to fix anti-aliasing
+k.loadShader(
+  "shader",
+  null,
+  `vec4 frag(vec2 pos, vec2 uv, vec4 color, sampler2D tex) {
+    vec4 c = def_frag();
+    if (c.r > 0.6) {
+      return vec4(0.9176470588, 0.3843137255, 0.3843137255, 1.0);
+    } else {
+      return vec4(0.2901960784, 0.1882352941, 0.3215686275, 1.0);
+    }
+  }`
+);
+
 k.scene("title", () => {
   // add title screen
   k.add([k.sprite("title", { frame: 0, anim: "main" }), k.pos()]);
@@ -93,6 +107,9 @@ k.scene("title", () => {
 
   // play music
   k.play("song", { loop: true });
+
+  // apply shader
+  k.usePostEffect("shader");
 
   // go to rules on click
   k.onClick(() => k.go("rules"));
